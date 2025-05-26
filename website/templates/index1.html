@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="main">
+        <div class="navbar">
+            <div class="logo">Research Hub</div>
+            <div class="menu">
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="{{ url_for('views.register') }}">Signup/Login</a></li>
+                    <li><a href="#">View</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="vid">
+            <video src="../static/WhatsApp Video .mp4" autoplay muted type="video/mp4" loop></video>
+            <div class="content">
+                <h1>Empowering Researchers</h1>
+                <h2>Publish & Showcase Your Work</h2>
+                <a href="{{ url_for('views.scholarly_articles') }}" class="btn">Get Started</a>
+            </div>
+        </div>
+    </div>    
+</body>
+</html>
+

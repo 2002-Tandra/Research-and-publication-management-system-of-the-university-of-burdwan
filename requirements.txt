@@ -1,0 +1,7 @@
+flask
+mysql-connector-python
+Flask-MySQLdb
+flask-login
+pymongo
+werkzeug
+dnspython
