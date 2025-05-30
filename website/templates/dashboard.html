@@ -59,7 +59,7 @@
       color: #4a0d78;
     }
 
-    .edit-form {
+    .edit-form, .journal-form {
       display: none;
       margin-top: 30px;
       padding: 25px;
@@ -70,7 +70,10 @@
     }
 
     .edit-form input,
-    .edit-form textarea {
+    .edit-form textarea,
+    .journal-form input,
+    .journal-form textarea,
+    .journal-form select {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
@@ -80,7 +83,8 @@
       background: white;
     }
 
-    .edit-form button {
+    .edit-form button,
+    .journal-form button {
       background-color: #4a0d78;
       color: white;
       padding: 12px 25px;
@@ -91,7 +95,8 @@
       transition: background-color 0.3s ease;
     }
 
-    .edit-form button:hover {
+    .edit-form button:hover,
+    .journal-form button:hover {
       background-color: #3b095e;
     }
 
@@ -107,7 +112,6 @@
       }
     }
 
-    /* Dropdown Menu Styles */
     .dropdown-container {
       position: absolute;
       top: 20px;
@@ -164,7 +168,7 @@
   <div class="dashboard-wrapper">
     <div class="dashboard-container">
 
-      <!-- Dropdown menu (Top-right corner) -->
+      <!-- Dropdown menu -->
       <div class="dropdown-container">
         <div class="dropdown">
           <button class="dropdown-toggle">⋮</button>
@@ -186,7 +190,6 @@
         <p><strong>Name:</strong> {{ scholar.username }}</p>
         <p><strong>Email:</strong> {{ scholar.email }}</p>
         <p><strong>Google Scholar ID:</strong> {{ scholar.google_scholar_id or 'N/A' }}</p>
-        <p><strong>Number of Publications:</strong> {{ scholar.publications or 'N/A' }}</p>
         <p><strong>Institution Name:</strong> {{ scholar.institution or 'N/A' }}</p>
       </div>
 
@@ -199,12 +202,53 @@
         <button type="submit">💾 Save Changes</button>
       </form>
 
+      <!-- Add Record Button -->
+      <div style="text-align: center; margin-top: 30px;">
+        <button onclick="toggleJournalForm()" style="
+          background-color: #4a0d78;
+          color: white;
+          padding: 12px 25px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 16px;
+          transition: background-color 0.3s ease;
+        ">➕ Add Record</button>
+      </div>
+
+      <!-- Publication Form -->
+      <form class="journal-form" method="POST" action="/upload-journal">
+        <h3 style="color: #4a0d78; margin-bottom: 20px;">📄 Publications Details Upload Form</h3>
+
+        <label for="publication_type"><strong>Select Publication Type:</strong></label>
+        <select name="publication_type" id="publication_type" onchange="renderPublicationForm()" required>
+          <option value="">-- Select Type --</option>
+          <option value="journal">Journal</option>
+          <option value="conference">Conference</option>
+          <option value="chapter">Chapter</option>
+          <option value="book">Book</option>
+          <option value="thesis">Thesis</option>
+          <option value="patent">Patent</option>
+          <option value="website">Website</option>
+          <option value="others">Others</option>
+        </select>
+
+        <div id="dynamic-fields"></div>
+        <button type="submit">📤 Submit</button>
+      </form>
+
     </div>
   </div>
 
   <script>
     function toggleForm() {
       const form = document.querySelector('.edit-form');
+      form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+    }
+
+    function toggleJournalForm() {
+      const form = document.querySelector('.journal-form');
       form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
     }
 
@@ -219,6 +263,27 @@
     document.addEventListener('click', function () {
       menu.style.display = 'none';
     });
+
+    function renderPublicationForm() {
+      const type = document.getElementById("publication_type").value;
+      const container = document.getElementById("dynamic-fields");
+
+      const fieldSets = {
+        journal: ["Title", "Authors", "Publication Date", "Journal", "Volume", "Issue", "Pages", "Publishers"],
+        conference: ["Title", "Authors", "Publication Date", "Conference", "Volume", "Issue", "Pages"],
+        chapter: ["Title", "Authors", "Publication Date", "Book", "Volume", "Issue", "Pages", "Publishers"],
+        book: ["Title", "Authors", "Publication Date", "Journal", "Volume", "Pages"],
+        thesis: ["Title", "Authors", "Publication Date", "Institution"],
+        patent: ["Title", "Inventors", "Publication Date"],
+        website: ["Title", "Authors", "Publication Date", "Source", "Report Number"],
+        others: ["Title", "Court", "Decided Date", "Reporter", "Docket ID"]
+      };
+
+      const fields = fieldSets[type] || [];
+      container.innerHTML = fields.map(field => `
+        <input type="text" name="${field.toLowerCase().replace(/ /g, "_")}" placeholder="${field}" required />
+      `).join('');
+    }
   </script>
 </body>
 </html>
