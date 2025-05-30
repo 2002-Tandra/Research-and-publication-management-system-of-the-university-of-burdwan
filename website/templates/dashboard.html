@@ -59,27 +59,6 @@
       color: #4a0d78;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    table th, table td {
-      text-align: left;
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      font-size: 15px;
-    }
-
-    table th {
-      background-color: #f2eafc;
-      color: #4a0d78;
-    }
-
     .edit-form {
       display: none;
       margin-top: 30px;
@@ -209,39 +188,6 @@
         <p><strong>Google Scholar ID:</strong> {{ scholar.google_scholar_id or 'N/A' }}</p>
         <p><strong>Number of Publications:</strong> {{ scholar.publications or 'N/A' }}</p>
         <p><strong>Institution Name:</strong> {{ scholar.institution or 'N/A' }}</p>
-      </div>
-
-      <!-- Contributions -->
-      <div class="card">
-        <h3 style="text-align:center;">Detailed Scholarly Contributions</h3>
-        <table>
-          <tbody>
-            <tr>
-              <th>Category</th>
-              <th>Details</th>
-            </tr>
-            <tr>
-              <td>Publication of Books</td>
-              <td>{{ scholar.books_publications or 'N/A' }}</td>
-            </tr>
-            <tr>
-              <td>Patents (Last 5 Years)</td>
-              <td>{{ scholar.patents_last_five_years or 'N/A' }}</td>
-            </tr>
-            <tr>
-              <td>Publication Chapters</td>
-              <td>{{ scholar.publication_chapters or 'N/A' }}</td>
-            </tr>
-            <tr>
-              <td>Research Projects (Last Year)</td>
-              <td>{{ scholar.research_projects_last_year or 'N/A' }}</td>
-            </tr>
-            <tr>
-              <td>Publications in Conferences</td>
-              <td>{{ scholar.conference_publications or 'N/A' }}</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
       <!-- Edit Form -->
