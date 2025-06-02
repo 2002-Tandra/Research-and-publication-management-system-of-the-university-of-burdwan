@@ -134,3 +134,32 @@ def update_dashboard():
 
     flash("Dashboard updated successfully!", "success")
     return redirect(url_for("views.dashboard"))
+
+# ✅ New Route for Handling Publication Uploads
+@views.route('/upload-journal', methods=['POST'])
+def upload_journal():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("Please login to upload publications.", "error")
+        return redirect(url_for('auth.login'))
+
+    publication_type = request.form.get('publication_type')
+    if not publication_type:
+        flash("Please select a publication type.", "error")
+        return redirect(url_for('views.dashboard'))
+
+    # Convert the form data into a dictionary (excluding the publication_type)
+    data = {key: value for key, value in request.form.items() if key != 'publication_type'}
+
+    # Add user context if needed
+    db = get_db()
+    user = db['users'].find_one({'_id': ObjectId(user_id)})
+    if user and user.get("username"):
+        data['Name'] = user["username"]
+
+    # Use a consistent naming convention for collections
+    collection_name = f"{publication_type.lower()}_publications"
+    db[collection_name].insert_one(data)
+
+    flash(f"{publication_type.capitalize()} record added successfully!", "success")
+    return redirect(url_for("views.dashboard"))

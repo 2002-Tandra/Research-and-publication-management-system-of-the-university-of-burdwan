@@ -13,12 +13,10 @@
       background: #f5f5fa;
       color: #333;
     }
-
     .dashboard-wrapper {
       height: 100vh;
       width: 100vw;
     }
-
     .dashboard-container {
       background: white;
       width: 100%;
@@ -27,19 +25,16 @@
       box-sizing: border-box;
       position: relative;
     }
-
     h2 {
       text-align: center;
       color: #4a0d78;
       margin-bottom: 10px;
     }
-
     img {
       width: 100px;
       border-radius: 50%;
       margin-bottom: 10px;
     }
-
     .card {
       background-color: #fafafa;
       padding: 20px;
@@ -47,18 +42,15 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
-
     .card p {
       margin: 8px 0;
       font-size: 16px;
     }
-
     .card h3 {
       margin-bottom: 15px;
       font-size: 20px;
       color: #4a0d78;
     }
-
     .edit-form, .journal-form {
       display: none;
       margin-top: 30px;
@@ -68,7 +60,6 @@
       box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
       animation: fadeIn 0.4s ease-in-out;
     }
-
     .edit-form input,
     .edit-form textarea,
     .journal-form input,
@@ -82,7 +73,6 @@
       font-size: 16px;
       background: white;
     }
-
     .edit-form button,
     .journal-form button {
       background-color: #4a0d78;
@@ -94,36 +84,30 @@
       font-weight: bold;
       transition: background-color 0.3s ease;
     }
-
     .edit-form button:hover,
     .journal-form button:hover {
       background-color: #3b095e;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @media (max-width: 600px) {
       table th, table td {
         font-size: 14px;
         padding: 10px;
       }
     }
-
     .dropdown-container {
       position: absolute;
       top: 20px;
       right: 20px;
       z-index: 100;
     }
-
     .dropdown {
       position: relative;
       display: inline-block;
     }
-
     .dropdown-toggle {
       background: transparent;
       border: none;
@@ -131,7 +115,6 @@
       cursor: pointer;
       color: #4a0d78;
     }
-
     .dropdown-menu {
       display: none;
       position: absolute;
@@ -143,7 +126,6 @@
       min-width: 160px;
       padding: 10px 0;
     }
-
     .dropdown-menu button,
     .dropdown-menu a {
       display: block;
@@ -157,7 +139,6 @@
       text-decoration: none;
       cursor: pointer;
     }
-
     .dropdown-menu button:hover,
     .dropdown-menu a:hover {
       background-color: #f2eafc;
@@ -168,7 +149,6 @@
   <div class="dashboard-wrapper">
     <div class="dashboard-container">
 
-      <!-- Dropdown menu -->
       <div class="dropdown-container">
         <div class="dropdown">
           <button class="dropdown-toggle">⋮</button>
@@ -185,7 +165,6 @@
       <h2>The University Of Burdwan</h2>
       <h2>🎓 Scholar Dashboard</h2>
 
-      <!-- Scholar Info -->
       <div class="card">
         <p><strong>Name:</strong> {{ scholar.username }}</p>
         <p><strong>Email:</strong> {{ scholar.email }}</p>
@@ -193,7 +172,6 @@
         <p><strong>Institution Name:</strong> {{ scholar.institution or 'N/A' }}</p>
       </div>
 
-      <!-- Edit Form -->
       <form class="edit-form" method="POST" action="/update-dashboard">
         <input type="text" name="username" placeholder="Name" value="{{ scholar.username }}" />
         <input type="text" name="email" placeholder="Email" value="{{ scholar.email }}" />
@@ -202,7 +180,6 @@
         <button type="submit">💾 Save Changes</button>
       </form>
 
-      <!-- Add Record Button -->
       <div style="text-align: center; margin-top: 30px;">
         <button onclick="toggleJournalForm()" style="
           background-color: #4a0d78;
@@ -217,7 +194,6 @@
         ">➕ Add Record</button>
       </div>
 
-      <!-- Publication Form -->
       <form class="journal-form" method="POST" action="/upload-journal">
         <h3 style="color: #4a0d78; margin-bottom: 20px;">📄 Publications Details Upload Form</h3>
 
