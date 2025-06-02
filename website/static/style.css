@@ -12,7 +12,6 @@
 .main {
     height: 100vh;
     width: 100%;
-    background: white;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -29,6 +28,7 @@
     padding: 15px 50px;
     background: white; 
     position: absolute;
+    z-index: 1;
     top: 0;
 }
 
@@ -60,25 +60,41 @@
     color: #109ccb;
 }
 
+.vid{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+video{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
 /* Content Section */
 .content {
     text-align: center;
+    top: 50%;
+    left: 50%;
     color: black;
-    position: relative;
+    position: absolute;
     z-index: 2;
 }
-
 .content h1 {
     font-size: 50px;
     font-weight: 600;
-    color: #333;
+    color: #08c4dd;
     text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
 }
-
 .content h2 {
-    font-size: 24px;
-    font-weight: 300;
-    color: #555;
+    font-size: 25px;
+    font-weight: 350;
+    color: hsl(0, 58%, 95%);
     margin-bottom: 20px;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
@@ -97,5 +113,5 @@
 }
 
 .btn:hover {
-    background: #109ccb;
+    background: #109ccb;
 }
