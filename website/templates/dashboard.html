@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Scholar Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
   <style>
     html, body {
       height: 100%;
@@ -12,10 +14,6 @@
       font-family: 'Roboto', sans-serif;
       background: #f5f5fa;
       color: #333;
-    }
-    .dashboard-wrapper {
-      height: 100vh;
-      width: 100vw;
     }
     .dashboard-container {
       background: white;
@@ -42,36 +40,21 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
-    .card p {
-      margin: 8px 0;
-      font-size: 16px;
-    }
-    .card h3 {
-      margin-bottom: 15px;
-      font-size: 20px;
-      color: #4a0d78;
-    }
     .edit-form, .journal-form {
       display: none;
       margin-top: 30px;
       padding: 25px;
       background: #f9f9f9;
       border-radius: 12px;
-      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
-      animation: fadeIn 0.4s ease-in-out;
     }
     .edit-form input,
-    .edit-form textarea,
     .journal-form input,
-    .journal-form textarea,
     .journal-form select {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      font-size: 16px;
-      background: white;
     }
     .edit-form button,
     .journal-form button {
@@ -82,31 +65,11 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
-    .edit-form button:hover,
-    .journal-form button:hover {
-      background-color: #3b095e;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @media (max-width: 600px) {
-      table th, table td {
-        font-size: 14px;
-        padding: 10px;
-      }
     }
     .dropdown-container {
       position: absolute;
       top: 20px;
       right: 20px;
-      z-index: 100;
-    }
-    .dropdown {
-      position: relative;
-      display: inline-block;
     }
     .dropdown-toggle {
       background: transparent;
@@ -120,11 +83,10 @@
       position: absolute;
       right: 0;
       background-color: white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       z-index: 1000;
       min-width: 160px;
-      padding: 10px 0;
     }
     .dropdown-menu button,
     .dropdown-menu a {
@@ -136,114 +98,176 @@
       text-align: left;
       font-size: 15px;
       color: #333;
-      text-decoration: none;
       cursor: pointer;
     }
     .dropdown-menu button:hover,
     .dropdown-menu a:hover {
       background-color: #f2eafc;
     }
+    table.dataTable {
+      margin-top: 30px !important;
+      width: 100% !important;
+    }
+    .dt-buttons button {
+      background-color: #4a0d78 !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 5px;
+      padding: 5px 10px;
+      margin-right: 5px;
+      font-size: 14px;
+    }
+    .action-btn {
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .edit-btn {
+      background-color: #4a90e2;
+    }
+    .delete-btn {
+      background-color: #e94b3c;
+    }
   </style>
 </head>
 <body>
-  <div class="dashboard-wrapper">
-    <div class="dashboard-container">
+  <div class="dashboard-container">
 
-      <div class="dropdown-container">
-        <div class="dropdown">
-          <button class="dropdown-toggle">⋮</button>
-          <div class="dropdown-menu">
-            <button onclick="toggleForm()">🛠 Edit Dashboard</button>
-            <a href="/logout">🚪 Logout</a>
-          </div>
+    <div class="dropdown-container">
+      <div class="dropdown">
+        <button class="dropdown-toggle">⋮</button>
+        <div class="dropdown-menu">
+          <button onclick="toggleForm()">🛠 Edit Dashboard</button>
+          <a href="/logout">🚪 Logout</a>
         </div>
       </div>
-
-      <div style="text-align: center; margin-bottom: 20px;">
-        <img src="{{ url_for('static', filename='ulogo.jpg') }}" alt="University Logo" />
-      </div>
-      <h2>The University Of Burdwan</h2>
-      <h2>🎓 Scholar Dashboard</h2>
-
-      <div class="card">
-        <p><strong>Name:</strong> {{ scholar.username }}</p>
-        <p><strong>Email:</strong> {{ scholar.email }}</p>
-        <p><strong>Google Scholar ID:</strong> {{ scholar.google_scholar_id or 'N/A' }}</p>
-        <p><strong>Institution Name:</strong> {{ scholar.institution or 'N/A' }}</p>
-      </div>
-
-      <form class="edit-form" method="POST" action="/update-dashboard">
-        <input type="text" name="username" placeholder="Name" value="{{ scholar.username }}" />
-        <input type="text" name="email" placeholder="Email" value="{{ scholar.email }}" />
-        <input type="text" name="google_scholar_id" placeholder="Google Scholar ID" value="{{ scholar.google_scholar_id }}" />
-        <input type="text" name="institution" placeholder="Institution Name" value="{{ scholar.institution }}" />
-        <button type="submit">💾 Save Changes</button>
-      </form>
-
-      <div style="text-align: center; margin-top: 30px;">
-        <button onclick="toggleJournalForm()" style="
-          background-color: #4a0d78;
-          color: white;
-          padding: 12px 25px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: bold;
-          font-size: 16px;
-          transition: background-color 0.3s ease;
-        ">➕ Add Record</button>
-      </div>
-
-      <form class="journal-form" method="POST" action="/upload-journal">
-        <h3 style="color: #4a0d78; margin-bottom: 20px;">📄 Publications Details Upload Form</h3>
-
-        <label for="publication_type"><strong>Select Publication Type:</strong></label>
-        <select name="publication_type" id="publication_type" onchange="renderPublicationForm()" required>
-          <option value="">-- Select Type --</option>
-          <option value="journal">Journal</option>
-          <option value="conference">Conference</option>
-          <option value="chapter">Chapter</option>
-          <option value="book">Book</option>
-          <option value="thesis">Thesis</option>
-          <option value="patent">Patent</option>
-          <option value="website">Website</option>
-          <option value="others">Others</option>
-        </select>
-
-        <div id="dynamic-fields"></div>
-        <button type="submit">📤 Submit</button>
-      </form>
-
     </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+      <img src="{{ url_for('static', filename='ulogo.jpg') }}" alt="University Logo" />
+    </div>
+    <h2>The University Of Burdwan</h2>
+    <h2>🎓 Scholar Dashboard</h2>
+
+    <div class="card">
+      <p><strong>Name:</strong> {{ scholar.username }}</p>
+      <p><strong>Email:</strong> {{ scholar.email }}</p>
+      <p><strong>Google Scholar ID:</strong> {{ scholar.google_scholar_id or 'N/A' }}</p>
+      <p><strong>Institution Name:</strong> {{ scholar.institution or 'N/A' }}</p>
+    </div>
+
+    <form class="edit-form" method="POST" action="/update-dashboard">
+      <input type="text" name="username" value="{{ scholar.username }}" placeholder="Name" />
+      <input type="text" name="email" value="{{ scholar.email }}" placeholder="Email" />
+      <input type="text" name="google_scholar_id" value="{{ scholar.google_scholar_id }}" placeholder="Google Scholar ID" />
+      <input type="text" name="institution" value="{{ scholar.institution }}" placeholder="Institution Name" />
+      <button type="submit">💾 Save Changes</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <button onclick="toggleJournalForm()" style="
+        background-color: #4a0d78;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 16px;
+      ">➕ Add Record</button>
+    </div>
+
+    <form class="journal-form" method="POST" action="/upload-journal">
+      <h3 style="color: #4a0d78;">📄 Publications Details Upload Form</h3>
+      <label for="publication_type"><strong>Publication Type:</strong></label>
+      <select name="publication_type" id="publication_type" onchange="renderPublicationForm()" required>
+        <option value="">-- Select Type --</option>
+        <option value="journal">Journal</option>
+        <option value="conference">Conference</option>
+        <option value="chapter">Chapter</option>
+        <option value="book">Book</option>
+        <option value="thesis">Thesis</option>
+        <option value="patent">Patent</option>
+        <option value="website">Website</option>
+        <option value="others">Others</option>
+      </select>
+      <div id="dynamic-fields"></div>
+      <button type="submit">📤 Submit</button>
+    </form>
+
+    <table id="publicationsTable" class="display">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Title</th>
+          <th>Authors</th>
+          <th>Publication Date</th>
+          <th>Source</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pub in publications %}
+        <tr>
+          <td>{{ pub.publication_type }}</td>
+          <td>{{ pub.title }}</td>
+          <td>{{ pub.authors }}</td>
+          <td>{{ pub.publication_date }}</td>
+          <td>{{ pub.source or pub.journal or pub.conference or pub.book or pub.institution or pub.website or 'N/A' }}</td>
+          <td>
+            <button class="action-btn edit-btn" onclick="editRecord('{{ pub._id }}')">✏️ Edit</button>
+            <button class="action-btn delete-btn" onclick="deleteRecord('{{ pub._id }}')">🗑 Delete</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
   </div>
 
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
   <script>
+    $(document).ready(function () {
+      $('#publicationsTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['csv', 'excel', 'pdf', 'print'],
+        pageLength: 5
+      });
+    });
+
     function toggleForm() {
       const form = document.querySelector('.edit-form');
-      form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+      form.style.display = form.style.display === 'block' ? 'none' : 'block';
     }
 
     function toggleJournalForm() {
       const form = document.querySelector('.journal-form');
-      form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+      form.style.display = form.style.display === 'block' ? 'none' : 'block';
     }
 
     const toggleBtn = document.querySelector('.dropdown-toggle');
     const menu = document.querySelector('.dropdown-menu');
-
-    toggleBtn.addEventListener('click', function (e) {
+    toggleBtn.addEventListener('click', e => {
       e.stopPropagation();
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     });
-
-    document.addEventListener('click', function () {
-      menu.style.display = 'none';
-    });
+    document.addEventListener('click', () => menu.style.display = 'none');
 
     function renderPublicationForm() {
       const type = document.getElementById("publication_type").value;
       const container = document.getElementById("dynamic-fields");
-
       const fieldSets = {
         journal: ["Title", "Authors", "Publication Date", "Journal", "Volume", "Issue", "Pages", "Publishers"],
         conference: ["Title", "Authors", "Publication Date", "Conference", "Volume", "Issue", "Pages"],
@@ -254,11 +278,26 @@
         website: ["Title", "Authors", "Publication Date", "Source", "Report Number"],
         others: ["Title", "Court", "Decided Date", "Reporter", "Docket ID"]
       };
-
       const fields = fieldSets[type] || [];
       container.innerHTML = fields.map(field => `
         <input type="text" name="${field.toLowerCase().replace(/ /g, "_")}" placeholder="${field}" required />
       `).join('');
+    }
+
+    function editRecord(id) {
+      alert("Edit functionality not implemented. Record ID: " + id);
+    }
+
+    function deleteRecord(id) {
+      if (confirm("Are you sure you want to delete this record?")) {
+        // Send request to delete endpoint
+        fetch(`/delete-publication/${id}`, {
+          method: 'DELETE'
+        }).then(res => {
+          if (res.ok) location.reload();
+          else alert("Failed to delete record.");
+        });
+      }
     }
   </script>
 </body>
