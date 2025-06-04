@@ -23,7 +23,7 @@ def login():
             return redirect(url_for('views.dashboard'))  # ✅ Redirect to dashboard
 
         else:
-            flash('Bokachoda Password thik kore de')  # ❌ or user doesn't exist
+            flash('wrong password')  # ❌ or user doesn't exist
 
     return render_template('login.html')  # ✅ Show login form (GET)
 
