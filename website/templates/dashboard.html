@@ -7,13 +7,15 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
+    body {
       font-family: 'Roboto', sans-serif;
-      background: #f5f5fa;
-      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: url(../static/back.jpg) no-repeat;
+      background-size:cover;
+      padding: 40px;
     }
     .dashboard-container {
       background: white;
@@ -147,7 +149,7 @@
     </div>
 
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="{{ url_for('static', filename='ulogo.jpg') }}" alt="University Logo" />
+      <img src="../static/ulogo.jpg" alt="University Logo" width="20%" height="20%" />
     </div>
     <h2>The University Of Burdwan</h2>
     <h2>🎓 Scholar Dashboard</h2>
