@@ -53,53 +53,43 @@ def dashboard():
 
     db = get_db()
     user = db['users'].find_one({'_id': ObjectId(user_id)})
-
     if not user:
         return redirect(url_for('auth.login'))
 
     scholar_name = user.get("username", "").lower()
+    publications = []
 
-    try:
-        # Book Publications (example)
-        book_collection = db['Details_of_Publication_of_Books_Last_Five_Years']
-        book_query = {"Name_of_the_Teacher": {"$regex": scholar_name, "$options": "i"}}
-        book_results = book_collection.find(book_query)
-        book_titles = [
-            doc.get("Title_of_the_book/chapters_published")
-            for doc in book_results
-            if doc.get("Title_of_the_book/chapters_published")
-        ]
-        user["books_publications"] = book_titles if book_titles else "N/A"
-    except Exception as e:
-        print("Error fetching books:", e)
-        user["books_publications"] = "N/A"
+    # 🔄 Fetch from all relevant collections
+    publication_collections = [
+        "journal_publications",
+        "conference_publications",
+        "chapter_publications",
+        "book_publications",
+        "thesis_publications",
+        "patent_publications",
+        "website_publications",
+        "others_publications"
+    ]
 
-    try:
-        # Research Publications
-        research_collection = db['Research_Publications']
-        publication_query = {"Name": {"$regex": scholar_name, "$options": "i"}}
-        publication_results = research_collection.find(publication_query)
-        publications_list = [
-            {
-                "title": pub.get("Title_of_the_Paper"),
-                "journal": pub.get("Journal_Name"),
-                "year": pub.get("Year"),
-                "doi": pub.get("DOI"),
-            }
-            for pub in publication_results
-            if pub.get("Title_of_the_Paper")
-        ]
-        user["research_publications"] = publications_list if publications_list else []
-    except Exception as e:
-        print("Error fetching research publications:", e)
-        user["research_publications"] = []
+    for col in publication_collections:
+        try:
+            for pub in db[col].find({"Name": {"$regex": scholar_name, "$options": "i"}}):
+                publications.append({
+                    "publication_type": col.replace("_publications", ""),
+                    "title": pub.get("title") or pub.get("Title") or "N/A",
+                    "authors": pub.get("authors") or pub.get("Authors") or pub.get("Inventors") or "N/A",
+                    "publication_date": pub.get("publication_date") or pub.get("Publication_Date") or "N/A",
+                    "source": (
+                        pub.get("source") or pub.get("Journal") or pub.get("Conference") or
+                        pub.get("Book") or pub.get("Institution") or pub.get("Website") or
+                        pub.get("court") or "N/A"
+                    ),
+                    "_id": str(pub.get("_id"))
+                })
+        except Exception as e:
+            print(f"Error reading from {col}:", e)
 
-    user["patents_last_five_years"] = "N/A"
-    user["publication_chapters"] = "N/A"
-    user["research_projects_last_year"] = "N/A"
-    user["conference_publications"] = "N/A"
-
-    return render_template('dashboard.html', scholar=user)
+    return render_template("dashboard.html", scholar=user, publications=publications)
 
 @views.route('/update-dashboard', methods=['POST'])
 def update_dashboard():
@@ -115,17 +105,10 @@ def update_dashboard():
         "username": request.form.get("username", "").strip(),
         "email": request.form.get("email", "").strip(),
         "google_scholar_id": request.form.get("google_scholar_id", "").strip(),
-        "institution": request.form.get("institution", "").strip(),
-        "publications": request.form.get("publications", "").strip()
+        "institution": request.form.get("institution", "").strip()
     }
 
     update_data = {k: v for k, v in update_data.items() if v}
-
-    if "publications" in update_data:
-        try:
-            update_data["publications"] = int(update_data["publications"])
-        except ValueError:
-            del update_data["publications"]
 
     users_collection.update_one(
         {"_id": ObjectId(user_id)},
@@ -135,7 +118,6 @@ def update_dashboard():
     flash("Dashboard updated successfully!", "success")
     return redirect(url_for("views.dashboard"))
 
-# ✅ New Route for Handling Publication Uploads
 @views.route('/upload-journal', methods=['POST'])
 def upload_journal():
     user_id = session.get('user_id')
@@ -148,18 +130,34 @@ def upload_journal():
         flash("Please select a publication type.", "error")
         return redirect(url_for('views.dashboard'))
 
-    # Convert the form data into a dictionary (excluding the publication_type)
     data = {key: value for key, value in request.form.items() if key != 'publication_type'}
 
-    # Add user context if needed
     db = get_db()
     user = db['users'].find_one({'_id': ObjectId(user_id)})
     if user and user.get("username"):
         data['Name'] = user["username"]
 
-    # Use a consistent naming convention for collections
     collection_name = f"{publication_type.lower()}_publications"
     db[collection_name].insert_one(data)
 
     flash(f"{publication_type.capitalize()} record added successfully!", "success")
     return redirect(url_for("views.dashboard"))
+
+@views.route('/delete-publication/<id>', methods=['DELETE'])
+def delete_publication(id):
+    db = get_db()
+    deleted = False
+
+    publication_collections = [
+        "journal_publications", "conference_publications", "chapter_publications",
+        "book_publications", "thesis_publications", "patent_publications",
+        "website_publications", "others_publications"
+    ]
+
+    for col in publication_collections:
+        result = db[col].delete_one({'_id': ObjectId(id)})
+        if result.deleted_count > 0:
+            deleted = True
+            break
+
+    return ('', 204) if deleted else ('Not Found', 404)
