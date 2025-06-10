@@ -4,10 +4,17 @@ from .database import get_db
 
 views = Blueprint('views', __name__)
 
+# Route for homepage (index1.html)
 @views.route('/')
 def home():
     return render_template('index1.html')
 
+# Route to explicitly support /index1.html for the Home button
+@views.route('/index1.html')
+def index1():
+    return render_template('index1.html')
+
+# Route for register/login page
 @views.route('/register')
 def register():
     return render_template('login.html')
@@ -59,7 +66,7 @@ def dashboard():
     scholar_name = user.get("username", "").lower()
     publications = []
 
-    # 🔄 Fetch from all relevant collections
+    # Fetch from all relevant collections
     publication_collections = [
         "journal_publications",
         "conference_publications",
@@ -155,9 +162,12 @@ def delete_publication(id):
     ]
 
     for col in publication_collections:
-        result = db[col].delete_one({'_id': ObjectId(id)})
-        if result.deleted_count > 0:
-            deleted = True
-            break
+        try:
+            result = db[col].delete_one({'_id': ObjectId(id)})
+            if result.deleted_count > 0:
+                deleted = True
+                break
+        except Exception as e:
+            print(f"Error deleting from {col}:", e)
 
     return ('', 204) if deleted else ('Not Found', 404)

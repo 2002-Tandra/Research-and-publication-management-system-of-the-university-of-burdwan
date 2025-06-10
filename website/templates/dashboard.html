@@ -140,6 +140,7 @@
       color: #333;
       cursor: pointer;
       transition: background 0.2s;
+      text-decoration: none;
     }
 
     .dropdown-menu button:hover,
@@ -195,16 +196,36 @@
     .add-record-btn:hover {
       background-color: #360a59;
     }
+
+    .home-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #4a0d78;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .home-btn:hover {
+      background-color: #360a59;
+    }
   </style>
 </head>
 <body>
   <div class="dashboard-container">
+    <!-- Top Left Home Button -->
+    <a href="/index1.html" class="home-btn">🏠 Home</a>
 
+    <!-- Dropdown Menu (Top Right) -->
     <div class="dropdown-container">
       <div class="dropdown">
         <button class="dropdown-toggle">⋮</button>
         <div class="dropdown-menu">
           <button onclick="toggleForm()">🛠 Edit Dashboard</button>
+          <a href="/index1.html">🏠 Home</a>
           <a href="/logout">🚪 Logout</a>
         </div>
       </div>
