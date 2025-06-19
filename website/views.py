@@ -171,3 +171,5 @@ def delete_publication(id):
             print(f"Error deleting from {col}:", e)
 
     return ('', 204) if deleted else ('Not Found', 404)
+
+

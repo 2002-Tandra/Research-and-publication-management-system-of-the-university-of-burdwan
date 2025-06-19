@@ -4,15 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    
+    <!-- External CSS and Fonts -->
     <link rel="stylesheet" href="{{ url_for('static', filename='login_style.css') }}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Admin Button Style -->
+    <style>
+        .admin-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .admin-button a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .admin-button a:hover {
+            background-color: #1a242f;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
         <h2>Welcome Back</h2>
         <p class="subtitle">Please login to your account</p>
 
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <div class="flash-messages">
@@ -21,10 +47,9 @@
                 {% endfor %}
                 </div>
             {% endif %}
-            {% endwith %}
+        {% endwith %}
 
-
-        <!-- ✅ Start of Login Form -->
+        <!-- Login Form -->
         <form method="POST" action="{{ url_for('auth.login') }}">
             <div class="input-box">
                 <input type="email" name="email" placeholder="Enter Email" required>
@@ -37,14 +62,18 @@
 
             <div class="remember-forgot">
                 <label><input type="checkbox"> Remember Me</label>
-                <a href="#">Forgot Password?</a>
+                <a href="{{ url_for('auth.forgot_password') }}">Forgot Password?</a>
             </div>
 
             <button class="btn" type="submit">Login</button>
         </form>
-        <!-- ✅ End of Login Form -->
 
         <p class="sign">Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign Up Here</a></p>
+
+        <!-- Admin Button -->
+        <div class="admin-button">
+            <a href="{{ url_for('admin.admin_login') }}">Admin Dashboard</a>
+        </div>
     </div>
 </body>
 </html>

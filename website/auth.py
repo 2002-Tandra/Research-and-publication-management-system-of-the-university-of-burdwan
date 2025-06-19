@@ -7,26 +7,21 @@ auth = Blueprint('auth', __name__)
 # === LOGIN ===
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    db = get_db()  # ✅ Get the MongoDB connection
-    users_collection = db['users']  # ✅ Access the 'users' collection
+    db = get_db()
+    users_collection = db['users']
 
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-
-        # ✅ Retrieve user by email
         user = users_collection.find_one({'email': email})
 
-        # ✅ If user exists and password is correct
         if user and check_password_hash(user['password'], password):
-            session['user_id'] = str(user['_id'])  # ✅ Store user ID in session
-            return redirect(url_for('views.dashboard'))  # ✅ Redirect to dashboard
-
+            session['user_id'] = str(user['_id'])
+            return redirect(url_for('views.dashboard'))
         else:
-            flash('wrong password')  # ❌ or user doesn't exist
+            flash('Wrong email or password!')
 
-    return render_template('login.html')  # ✅ Show login form (GET)
-
+    return render_template('login.html')
 
 
 # === LOGOUT ===
@@ -58,8 +53,6 @@ def signup():
             return redirect(url_for('auth.signup'))
 
         hashed_password = generate_password_hash(password)
-
-        # Insert new user
         user_data = {
             'username': username,
             'email': email,
@@ -71,3 +64,44 @@ def signup():
         return redirect(url_for('auth.login'))
 
     return render_template('signup.html')
+
+
+# === FORGOT PASSWORD ===
+@auth.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    db = get_db()
+    users_collection = db['users']
+
+    if request.method == 'POST':
+        email = request.form['email']
+        user = users_collection.find_one({'email': email})
+
+        if user:
+            # ⚠️ Note: In production, send an email with secure token
+            return redirect(url_for('auth.reset_password', email=email))
+        else:
+            flash("Email not found!")
+
+    return render_template('forgot_password.html')
+
+
+# === RESET PASSWORD ===
+@auth.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    db = get_db()
+    users_collection = db['users']
+    email = request.args.get('email')
+
+    if request.method == 'POST':
+        password1 = request.form.get('password1')
+        password2 = request.form.get('password2')
+
+        if password1 != password2:
+            flash("Passwords do not match!")
+        else:
+            hashed = generate_password_hash(password1)
+            users_collection.update_one({'email': email}, {'$set': {'password': hashed}})
+            flash("Password reset successfully!")
+            return redirect(url_for('auth.login'))
+
+    return render_template('reset_password.html', email=email)
