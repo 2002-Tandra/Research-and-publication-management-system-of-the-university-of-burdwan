@@ -154,18 +154,7 @@
               </td>
               <td>{{ user.api_score if user.api_score else "Not Set" }}</td>
           </tr>
-          <tr>
-            <td>{{ index }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.department if user.department else "N/A" }}</td>
-            <td>
-              <button class="details-button" onclick="viewDetails('{{ user._id }}')">Details</button>
-            </td>
-            <td>
-              <button class="details-button" onclick="window.location.href='/admin/publications/{{ user._id }}'">View</button>
-            </td>
-            <td>{{ user.api_score if user.api_score else "Not Set" }}</td>
-          </tr>
+          
         {% endfor %}
       </tbody>
     </table>
