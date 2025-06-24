@@ -9,10 +9,15 @@ views = Blueprint('views', __name__)
 def home():
     return render_template('index1.html')
 
-# Route to explicitly support /index1.html for the Home button
+# Route to explicitly support /index1.html
 @views.route('/index1.html')
 def index1():
     return render_template('index1.html')
+
+# ✅ Route for About Us page
+@views.route('/about-us')
+def about_us():
+    return render_template('about_us.html')
 
 # Route for register/login page
 @views.route('/register')
@@ -66,7 +71,6 @@ def dashboard():
     scholar_name = user.get("username", "").lower()
     publications = []
 
-    # Fetch from all relevant collections
     publication_collections = [
         "journal_publications",
         "conference_publications",
@@ -171,5 +175,3 @@ def delete_publication(id):
             print(f"Error deleting from {col}:", e)
 
     return ('', 204) if deleted else ('Not Found', 404)
-
-
