@@ -4,22 +4,18 @@ from .database import get_db
 
 views = Blueprint('views', __name__)
 
-# Route for homepage (index1.html)
 @views.route('/')
 def home():
     return render_template('index1.html')
 
-# Route to explicitly support /index1.html
 @views.route('/index1.html')
 def index1():
     return render_template('index1.html')
 
-# ✅ Route for About Us page
 @views.route('/about-us')
 def about_us():
     return render_template('about_us.html')
 
-# Route for register/login page
 @views.route('/register')
 def register():
     return render_template('login.html')
@@ -100,7 +96,10 @@ def dashboard():
         except Exception as e:
             print(f"Error reading from {col}:", e)
 
-    return render_template("dashboard.html", scholar=user, publications=publications)
+    # 🟩 Fetch qualifications for the logged-in user
+    qualifications = list(db['qualifications'].find({"user_id": ObjectId(user_id)}))
+
+    return render_template("dashboard.html", scholar=user, publications=publications, qualifications=qualifications)
 
 @views.route('/update-dashboard', methods=['POST'])
 def update_dashboard():
@@ -175,3 +174,33 @@ def delete_publication(id):
             print(f"Error deleting from {col}:", e)
 
     return ('', 204) if deleted else ('Not Found', 404)
+
+# ✅ NEW ROUTE: Upload Qualification
+@views.route('/upload-qualification', methods=['POST'])
+def upload_qualification():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("You must be logged in to upload qualification.", "error")
+        return redirect(url_for('auth.login'))
+
+    db = get_db()
+
+    qualifications_data = {
+        "graduation": request.form.get("graduation", "").strip(),
+        "post_graduation": request.form.get("post_graduation", "").strip(),
+        "mphil": request.form.get("mphil", "").strip(),
+        "phd": request.form.get("phd", "").strip(),
+        "net_with_jrf": request.form.get("net_with_jrf", "").strip(),
+        "research_publications": request.form.get("research_publications", "").strip(),
+        "technical_experience": request.form.get("technical_experience", "").strip(),
+        "international_awards": request.form.get("international_awards", "").strip(),
+        "state_awards": request.form.get("state_awards", "").strip(),
+        "user_id": ObjectId(user_id)
+    }
+
+    # ✅ Check that all fields actually have values
+    print("Received qualifications:", qualifications_data)
+
+    db.qualifications.insert_one(qualifications_data)
+    return redirect(url_for('views.dashboard'))
+
