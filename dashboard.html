@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scholar Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: url(../static/back.jpg) no-repeat center center fixed;
+      background-size: cover;
+      padding: 40px;
+      margin: 0;
+    }
+
+    .dashboard-container {
+      background: #ffffffee;
+      width: 100%;
+      max-width: 1200px;
+      padding: 30px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      box-sizing: border-box;
+      position: relative;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    h2 {
+      text-align: center;
+      color: #4a0d78;
+      margin-bottom: 10px;
+    }
+
+    img {
+      width: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background-color: #fafafa;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+    }
+
+    .edit-form,
+    .journal-form,
+    .qualification-form {
+      display: none;
+      margin-top: 30px;
+      padding: 25px;
+      background: #f9f8ff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .edit-form input,
+    .journal-form input,
+    .journal-form select,
+    .qualification-form input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 18px;
+      border: 1px solid #d2cde0;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .edit-form button,
+    .journal-form button,
+    .qualification-form button {
+      background-color: #4a0d78;
+      color: white;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 15px;
+      transition: background 0.3s ease;
+    }
+
+    .edit-form button:hover,
+    .journal-form button:hover,
+    .qualification-form button:hover {
+      background-color: #360a59;
+    }
+
+    .dropdown-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .dropdown-toggle {
+      background: transparent;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #4a0d78;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      z-index: 1000;
+      min-width: 160px;
+      padding: 8px 0;
+    }
+
+    .dropdown-menu a,
+    .dropdown-menu button {
+      display: block;
+      width: 100%;
+      padding: 10px 20px;
+      text-align: left;
+      background: none;
+      border: none;
+      font-size: 15px;
+      color: #333;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+
+    .dropdown-menu a:hover,
+    .dropdown-menu button:hover {
+      background-color: #f3f0fb;
+    }
+
+    table.dataTable {
+      margin-top: 30px !important;
+      width: 100% !important;
+      border-collapse: collapse;
+    }
+
+    table.dataTable tbody tr:hover {
+      background-color: #f3f0fb;
+    }
+
+    .dt-buttons button {
+      background-color: #4a0d78 !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 5px;
+      padding: 6px 12px;
+      margin-right: 6px;
+      font-size: 14px;
+    }
+
+    .action-btn {
+      border: none;
+      border-radius: 6px;
+      padding: 7px 14px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 6px;
+    }
+
+    .edit-btn { background-color: #4a90e2; }
+    .delete-btn { background-color: #e94b3c; }
+
+    .add-record-btn {
+      background-color: #4a0d78;
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    .add-record-btn:hover {
+      background-color: #360a59;
+    }
+
+    .home-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #4a0d78;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .home-btn:hover {
+      background-color: #360a59;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container { padding: 20px; }
+      .home-btn, .dropdown-container { top: 10px; }
+      h2 { font-size: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="dashboard-container">
+  <a href="/index1.html" class="home-btn">🏠 Home</a>
+
+  <div class="dropdown-container">
+    <div class="dropdown">
+      <button class="dropdown-toggle">⋮</button>
+      <div class="dropdown-menu">
+        <button onclick="toggleForm()">🛠 Edit Dashboard</button>
+        <a href="/logout">🚪 Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <img src="../static/ulogo.jpg" alt="University Logo" />
+  </div>
+  <h2>The University Of Burdwan</h2>
+  <h2>🎓 User Dashboard</h2>
+
+  <div class="card">
+    <p><strong>Name:</strong> {{ scholar.username }}</p>
+    <p><strong>Email:</strong> {{ scholar.email }}</p>
+    <p><strong>Google Scholar ID:</strong> {{ scholar.google_scholar_id or 'N/A' }}</p>
+    <p><strong>Institution Name:</strong> {{ scholar.institution or 'N/A' }}</p>
+
+    {% if qualifications %}
+    <div style="margin-top: 15px;">
+      <h4 style="color: #4a0d78;">🧾 Qualifications:</h4>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+          <tr style="background-color: #f3f0fb; text-align: left;">
+            <th style="padding: 8px;">Graduation</th>
+            <th style="padding: 8px;">Post-grad</th>
+            <th style="padding: 8px;">M.Phil</th>
+            <th style="padding: 8px;">PhD</th>
+            <th style="padding: 8px;">NET w/ JRF</th>
+            <th style="padding: 8px;">Publications</th>
+            <th style="padding: 8px;">Experience</th>
+            <th style="padding: 8px;">Intl Awards</th>
+            <th style="padding: 8px;">State Awards</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for q in qualifications %}
+          <tr style="background-color: #fff;">
+            <td style="padding: 8px;">{{ q.graduation }}</td>
+            <td style="padding: 8px;">{{ q.post_graduation }}</td>
+            <td style="padding: 8px;">{{ q.mphil }}</td>
+            <td style="padding: 8px;">{{ q.phd }}</td>
+            <td style="padding: 8px;">{{ q.net_with_jrf }}</td>
+            <td style="padding: 8px;">{{ q.research_publications }}</td>
+            <td style="padding: 8px;">{{ q.technical_experience }}</td>
+            <td style="padding: 8px;">{{ q.international_awards }}</td>
+            <td style="padding: 8px;">{{ q.state_awards }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Edit Basic Info -->
+  <form class="edit-form" method="POST" action="/update-dashboard">
+    <input type="text" name="username" value="{{ scholar.username }}" placeholder="Name" />
+    <input type="text" name="email" value="{{ scholar.email }}" placeholder="Email" />
+    <input type="text" name="google_scholar_id" value="{{ scholar.google_scholar_id }}" placeholder="Google Scholar ID" />
+    <input type="text" name="institution" value="{{ scholar.institution }}" placeholder="Institution Name" />
+    <button type="submit">💾 Save Changes</button>
+  </form>
+
+  <!-- Add Qualification Form -->
+  <div style="text-align: center;">
+    <button onclick="toggleQualificationForm()" class="add-record-btn">🎓 Add Qualification</button>
+  </div>
+
+  <form class="qualification-form" method="POST" action="/upload-qualification" onsubmit="this.querySelector('button').disabled = true;">
+    <h3 style="color: #4a0d78;">🧾 Qualification Details</h3>
+    <input type="text" name="graduation" placeholder="Graduation" required>
+    <input type="text" name="post_graduation" placeholder="Post-graduation" required>
+    <input type="text" name="mphil" placeholder="M.Phil" required>
+    <input type="text" name="phd" placeholder="PhD" required>
+    <input type="text" name="net_with_jrf" placeholder="NET with JRF" required>
+    <input type="text" name="research_publications" placeholder="Research Publications" required>
+    <input type="text" name="technical_experience" placeholder="Technical Experience" required>
+    <input type="text" name="international_awards" placeholder="International Awards" required>
+    <input type="text" name="state_awards" placeholder="State Awards" required>
+    <button type="submit">📤 Submit</button>
+  </form>
+
+  <!-- Publications Section -->
+  <div style="text-align: center;">
+    <button onclick="toggleJournalForm()" class="add-record-btn">➕ Add Record</button>
+  </div>
+
+  <form class="journal-form" method="POST" action="/upload-journal">
+    <h3 style="color: #4a0d78;">📄 Publications Details Upload Form</h3>
+    <label><strong>Publication Type:</strong></label>
+    <select name="publication_type" id="publication_type" onchange="renderPublicationForm()" required>
+      <option value="">-- Select Type --</option>
+      <option value="journal">Journal</option>
+      <option value="conference">Conference</option>
+      <option value="chapter">Chapter</option>
+      <option value="book">Book</option>
+      <option value="thesis">Thesis</option>
+      <option value="patent">Patent</option>
+      <option value="website">Website</option>
+      <option value="others">Others</option>
+    </select>
+    <div id="dynamic-fields"></div>
+    <button type="submit">📤 Submit</button>
+  </form>
+
+  <!-- Publications Table -->
+  <table id="publicationsTable" class="display">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Title</th>
+        <th>Authors</th>
+        <th>Publication Date</th>
+        <th>Source</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pub in publications %}
+      <tr>
+        <td>{{ pub.publication_type }}</td>
+        <td>{{ pub.title }}</td>
+        <td>{{ pub.authors }}</td>
+        <td>{{ pub.publication_date }}</td>
+        <td>{{ pub.source }}</td>
+        <td>
+          <button class="action-btn edit-btn" onclick="editRecord('{{ pub._id }}')">✏️ Edit</button>
+          <button class="action-btn delete-btn" onclick="deleteRecord('{{ pub._id }}')">🗑 Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $('#publicationsTable').DataTable({
+      dom: 'Bfrtip',
+      buttons: ['csv', 'excel', 'pdf', 'print'],
+      pageLength: 5
+    });
+  });
+
+  function toggleForm() {
+    const form = document.querySelector('.edit-form');
+    form.style.display = form.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function toggleJournalForm() {
+    const form = document.querySelector('.journal-form');
+    form.style.display = form.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function toggleQualificationForm() {
+    const form = document.querySelector('.qualification-form');
+    form.style.display = form.style.display === 'block' ? 'none' : 'block';
+  }
+
+  const toggleBtn = document.querySelector('.dropdown-toggle');
+  const menu = document.querySelector('.dropdown-menu');
+  toggleBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  });
+  document.addEventListener('click', () => menu.style.display = 'none');
+
+  function renderPublicationForm() {
+    const type = document.getElementById("publication_type").value;
+    const container = document.getElementById("dynamic-fields");
+    const fieldSets = {
+      journal: ["Title", "Authors", "Publication Date", "Journal", "Volume", "Issue", "Pages", "Publishers"],
+      conference: ["Title", "Authors", "Publication Date", "Conference", "Volume", "Issue", "Pages"],
+      chapter: ["Title", "Authors", "Publication Date", "Book", "Volume", "Issue", "Pages", "Publishers"],
+      book: ["Title", "Authors", "Publication Date", "Journal", "Volume", "Pages"],
+      thesis: ["Title", "Authors", "Publication Date", "Institution"],
+      patent: ["Title", "Inventors", "Publication Date"],
+      website: ["Title", "Authors", "Publication Date", "Source", "Report Number"],
+      others: ["Title", "Court", "Decided Date", "Reporter", "Docket ID"]
+    };
+    const fields = fieldSets[type] || [];
+    container.innerHTML = fields.map(field => `
+      <input type="text" name="${field.toLowerCase().replace(/ /g, "_")}" placeholder="${field}" required />
+    `).join('');
+  }
+
+  function editRecord(id) {
+    alert("Edit functionality not implemented yet. ID: " + id);
+  }
+
+  function deleteRecord(id) {
+    if (confirm("Are you sure you want to delete this record?")) {
+      fetch(`/delete-publication/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      }).then(res => {
+        if (res.ok) location.reload();
+        else alert("Failed to delete record.");
+      }).catch(err => {
+        alert("Error deleting record.");
+      });
+    }
+  }
+</script>
+</body>
+</html>
