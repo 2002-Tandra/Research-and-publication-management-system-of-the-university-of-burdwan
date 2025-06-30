@@ -53,6 +53,22 @@ def scholarly_articles():
         selected_collection=selected_collection
     )
 
+def calculate_api_score(q):
+    score = 0
+    if q.get("graduation") == "Yes": score += 5
+    if q.get("post_graduation") == "Yes": score += 10
+    if q.get("mphil") == "Yes": score += 10
+    if q.get("phd") == "Yes": score += 20
+    if q.get("net_with_jrf") == "Yes": score += 15
+    try:
+        score += int(q.get("research_publications", 0)) * 2
+        score += int(q.get("technical_experience", 0)) * 1
+        score += int(q.get("state_awards", 0)) * 3
+        score += int(q.get("international_awards", 0)) * 5
+    except ValueError:
+        pass
+    return score
+
 @views.route('/dashboard')
 def dashboard():
     user_id = session.get('user_id')
@@ -96,10 +112,12 @@ def dashboard():
         except Exception as e:
             print(f"Error reading from {col}:", e)
 
-    # 🟩 Fetch qualifications for the logged-in user
     qualifications = list(db['qualifications'].find({"user_id": ObjectId(user_id)}))
+    latest_qualification = qualifications[-1] if qualifications else {}
+    api_score = calculate_api_score(latest_qualification) if latest_qualification else 0
 
-    return render_template("dashboard.html", scholar=user, publications=publications, qualifications=qualifications)
+    return render_template("dashboard.html", scholar=user, publications=publications,
+                           qualifications=qualifications, api_score=api_score)
 
 @views.route('/update-dashboard', methods=['POST'])
 def update_dashboard():
@@ -175,7 +193,6 @@ def delete_publication(id):
 
     return ('', 204) if deleted else ('Not Found', 404)
 
-# ✅ NEW ROUTE: Upload Qualification
 @views.route('/upload-qualification', methods=['POST'])
 def upload_qualification():
     user_id = session.get('user_id')
@@ -198,9 +215,5 @@ def upload_qualification():
         "user_id": ObjectId(user_id)
     }
 
-    # ✅ Check that all fields actually have values
-    print("Received qualifications:", qualifications_data)
-
     db.qualifications.insert_one(qualifications_data)
     return redirect(url_for('views.dashboard'))
-
