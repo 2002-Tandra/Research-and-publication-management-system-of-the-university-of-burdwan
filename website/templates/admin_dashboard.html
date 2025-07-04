@@ -135,8 +135,7 @@
           <th>Sl No</th>
           <th>Name</th>
           <th>Department</th>
-          <th>Details</th>
-          <th>View Publication</th>
+          <
           <th>API Score</th>
         </tr>
       </thead>
@@ -146,12 +145,6 @@
             <td>{{ loop.index }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.department if user.department else "N/A" }}</td>
-            <td>
-              <button class="details-button" onclick="redirectToUserDashboard('{{ user._id }}')">Details</button>
-            </td>
-            <td>
-              <button class="details-button" onclick="window.location.href='/admin/publications/{{ user._id }}'">View</button>
-            </td>
             <td>
               {{ '%.2f' % user.api_score if user.api_score is not none else '0.00' }}
             </td>
