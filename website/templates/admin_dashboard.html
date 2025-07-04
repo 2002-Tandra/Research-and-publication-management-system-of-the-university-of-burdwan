@@ -143,27 +143,27 @@
       <tbody id="data-table">
         {% for user in users %}
           <tr>
-              <td>{{ loop.index }}</td>  <!-- loop.index starts from 1 -->
-              <td>{{ user.username }}</td>
-              <td>{{ user.department if user.department else "N/A" }}</td>
-              <td>
-                  <button class="details-button" onclick="redirectToUserDashboard('{{ user._id }}')">Details</button>
-              </td>
-              <td>
-                  <button class="details-button" onclick="window.location.href='/admin/publications/{{ user._id }}'">View</button>
-              </td>
-              <td>{{ user.api_score if user.api_score else "Not Set" }}</td>
+            <td>{{ loop.index }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.department if user.department else "N/A" }}</td>
+            <td>
+              <button class="details-button" onclick="redirectToUserDashboard('{{ user._id }}')">Details</button>
+            </td>
+            <td>
+              <button class="details-button" onclick="window.location.href='/admin/publications/{{ user._id }}'">View</button>
+            </td>
+            <td>
+              {{ '%.2f' % user.api_score if user.api_score is not none else '0.00' }}
+            </td>
           </tr>
-          
         {% endfor %}
       </tbody>
     </table>
   </div>
 
   <script>
-    function viewDetails(userId) {
-      alert("View details for user ID: " + userId);
-      // You can replace this with modal logic or page navigation
+    function redirectToUserDashboard(userId) {
+      window.location.href = '/admin/user/' + userId;
     }
   </script>
 </body>
