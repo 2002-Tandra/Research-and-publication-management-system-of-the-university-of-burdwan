@@ -58,7 +58,8 @@
 
     .edit-form,
     .journal-form,
-    .qualification-form {
+    .qualification-form,
+    .adqualification-form {
       display: none;
       margin-top: 30px;
       padding: 25px;
@@ -70,7 +71,8 @@
     .edit-form input,
     .journal-form input,
     .journal-form select,
-    .qualification-form input, select{
+    .qualification-form input, select,
+    .adqualification-form input, select{
       width: 100%;
       padding: 14px;
       margin-bottom: 18px;
@@ -81,7 +83,8 @@
 
     .edit-form button,
     .journal-form button,
-    .qualification-form button {
+    .qualification-form button,
+    .adqualification-form button {
       background-color: #4a0d78;
       color: white;
       padding: 12px 28px;
@@ -95,7 +98,8 @@
 
     .edit-form button:hover,
     .journal-form button:hover,
-    .qualification-form button:hover {
+    .qualification-form button:hover,
+    .adqualification-form button:hover {
       background-color: #360a59;
     }
 
@@ -254,19 +258,54 @@
         <h4 style="color: #4a0d78;">🧾 Qualifications:</h4>
         {% for q in qualifications %}
         <div style="background-color: #f9f9f9; padding: 16px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-          <p><strong>Graduation:</strong> {{ q.graduation }}</p>
-          <p><strong>Post-grad:</strong> {{ q.post_graduation }}</p>
-          <p><strong>M.Phil:</strong> {{ q.mphil }}</p>
-          <p><strong>PhD:</strong> {{ q.phd }}</p>
-          <p><strong>NET w/ JRF:</strong> {{ q.net_with_jrf }}</p>
-          <p><strong>Publications:</strong> {{ q.research_publications }}</p>
-          <p><strong>Experience:</strong> {{ q.technical_experience }}</p>
-          <p><strong>International Awards:</strong> {{ q.international_awards }}</p>
-          <p><strong>State Awards:</strong> {{ q.state_awards }}</p>
+          <p><strong>Qualification:</strong> {{ q.qualification }}</p>
+          <p><strong>Decipline:</strong> {{ q.decipline }}</p>
+          <p><strong>Institution:</strong> {{ q.institution }}</p>
+          <p><strong>Marks(%):</strong> {{ q.marks }}</p>
         </div>
         {% endfor %}
         {% else %}
         <p>No qualifications found.</p>
+        {% endif %}
+
+        {% if adqualifications %}
+        <h4 style="color: #4a0d78;">🧾 Additional Qualifications:</h4>
+        {% for aq in adqualifications %}
+        <div style="background-color: #f9f9f9; padding: 16px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <p><strong>Qualification:</strong> {{ aq.adqualification }}</p>
+          <p><strong>Year:</strong> {{ aq.Year }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No adqualifications found.</p>
+        {% endif %}
+
+        {% if adawards %}
+        <h4 style="color: #4a0d78;">🏅 Awards:</h4>
+        {% for award in adawards %}
+        <div style="background-color: #f9f9f9; padding: 16px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <p><strong>Award Type:</strong> {{ award.Award_Name }}</p>
+          <p><strong>Award Name:</strong> {{ award.Awards_name }}</p>
+          <p><strong>Date:</strong> {{ award.Date }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No awards found.</p>
+        {% endif %}
+
+
+        {% if adexperience %}
+        <h4 style="color: #4a0d78;">🧾 Experience:</h4>
+        {% for exp in adexperience %}
+        <div style="background-color: #f9f9f9; padding: 16px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <p><strong>Title:</strong> {{ exp.Title }}</p>
+          <p><strong>Company/Organization:</strong> {{ exp.Companyororganization }}</p>
+          <p><strong>Start Date:</strong> {{ exp.StartDate }}</p>
+          <p><strong>End Date:</strong> {{ exp.EndDate }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No experience records found.</p>
         {% endif %}
       </div>
     </td>
@@ -294,52 +333,62 @@
   <!-- Add Qualification Form -->
   <div style="text-align: center;">
     <button onclick="toggleQualificationForm()" class="add-record-btn">🎓 Add Qualification</button>
+    <button onclick="toggleadQualificationForm()" class="add-record-btn">🎓 Add Additional Qualification</button>
   </div>
 
   <form class="qualification-form" method="POST" action="/upload-qualification" onsubmit="this.querySelector('button').disabled = true;">
     <h3 style="color: #4a0d78;">🧾 Qualification Details</h3>
-    <select type="text" name="graduation" placeholder="Graduation" required>
-      <option value="ug">Under Graduation</option>
-      <option>Post Graducation</option>
-      <option>M.Phil</option>
-      <option>Ph.D.</option>
+    <select type="text" name="qualification" placeholder="Graduation" required>
+      <option value="Under Graduation">Under Graduation</option>
+      <option value="Post Graducation">Post Graducation</option>
+      <option value="M.Phil">M.Phil</option>
+      <option value="Ph.D.">Ph.D.</option>
     </select>
-    <input type="text" name="post_graduation" placeholder="course title" required>
-    <input type="text" name="mphil" placeholder="Institution" required>
-    <input type="text" name="phd" placeholder="Marks in %" required>
-    <input type="date" name="net_with_jrf" placeholder="Start Year" required>
-    <input type="date" name="net_with_jrf2" placeholder="ENd Year" required>
+    <input type="text" name="decipline" placeholder="course title" required>
+    <input type="text" name="institution" placeholder="Institution" required>
+    <input type="text" name="marks" placeholder="Marks in %" required>
     <button type="submit">📤 Submit</button>
-    <h3 style="color: #4a0d78;">🧾 Additional Qualification Details</h3>
-    <select type="text" name="graduation" placeholder="Graduation" required>
-      <option value="ug">NET with JRF</option>
-      <option>GATE</option>
-      <input type="text" name="Year" placeholder="Year" required>
-      
+    </form>
+
+
+    
+    <form  method="POST" class="adqualification-form" action="/upload-adqualification" onsubmit="this.querySelector('button').disabled = true;">
+      <h3 style="color: #4a0d78;">🧾 Additional Qualification Details</h3>
+    <select type="text" name="adqualification" placeholder="Graduation" required>
+      <option value="UGC JRF">NET with JRF</option>
+      <option value="GATE">GATE</option>      
     </select>
+    <input type="text" name="Year" placeholder="Year" required>
+    <button type="submit">📤 Submit</button>
+    </form>
+    <form method="POST" class="adexperience-form" action="/upload-adexperience" onsubmit="this.querySelector('button').disabled = true;">
     <h3 style="color: #4a0d78;">🧾 Experience</h3>
-    <select type="text" name="graduation" placeholder="Graduation" required>
+    <select type="text" name="experience" placeholder="Graduation" required>
       <option>Empolyment type</option>
-      <option>Full time</option>
-      <option>Part time</option>
-      <option>Self emplyed time</option>
-      <option>Freelance</option>
-      <option>Internship</option>
-      <option>Trainee</option>
+      <option value="FULL TIME">Full time</option>
+      <option value="PART TIME">Part time</option>
+      <option value="SELF EMPLOYED">Self employed</option>
+      <option value="FREELANCE">Freelance</option>
+      <option value="INTERNSHIP">Internship</option>
+      <option value="TRAINEE">Trainee</option>
     </select>
     <input type="text" name="Title" placeholder="Title" required>
-    <input type="text" name="Company or organization" placeholder="Company or organization" required>
-     <h3 style="color: #4a0d78;">🧾Awards</h3>
-    <select type="text" name="Awards" placeholder="Awards" required>
-      <option>International awards</option>
-      
-      <option>State awards</option>
-    </select>
-    
-    <input type="text" name="Awards name" placeholder="Awards name" required>
-    <input type="date" name="Date" placeholder="Date" required>
+    <input type="text" name="Companyororganization" placeholder="Company or organization" required>
+    <input type="date" name="StartDate" placeholder="Start Date" required>
+    <input type="date" name="EndDate" placeholder="End Date" required>
     <button type="submit">📤 Submit</button>
-  </form>
+    </form>
+
+    <h3 style="color: #4a0d78;">🧾Awards</h3>
+    <form method="POST" class="adAwards-form" action="/upload-adAwards" onsubmit="this.querySelector('button').disabled = true;">
+      <select name="Award_Name" required>
+        <option value="International_awards">International awards</option>
+        <option value="State_awards">State awards</option>
+      </select>
+      <input type="text" name="Awards_name" placeholder="Awards name" required>
+      <input type="date" name="Date" placeholder="Date" required>
+      <button type="submit">📤 Submit</button>
+    </form>
 
   <!-- Publications Section -->
   <div style="text-align: center;">
@@ -427,6 +476,10 @@
     const form = document.querySelector('.qualification-form');
     form.style.display = form.style.display === 'block' ? 'none' : 'block';
   }
+   function toggleadQualificationForm() {
+    const form = document.querySelector('.adqualification-form');
+    form.style.display = form.style.display === 'block' ? 'none' : 'block';
+  }
 
   const toggleBtn = document.querySelector('.dropdown-toggle');
   const menu = document.querySelector('.dropdown-menu');
@@ -475,3 +528,4 @@
 </script>
 </body>
 </html>
+

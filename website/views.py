@@ -117,11 +117,23 @@ def dashboard():
             print(f"Error reading from {col}:", e)
 
     qualifications = list(db['qualifications'].find({"user_id": ObjectId(user_id)}))
+    adqualifications = list(db['adqualifications'].find({"user_id": ObjectId(user_id)}))
+    adawards = list(db['adAwards'].find({"user_id": ObjectId(user_id)}))  # ✅ Fetch awards
+    adexperience = list(db['adexperience'].find({"user_id": ObjectId(user_id)}))
     latest_qualification = qualifications[-1] if qualifications else {}
     api_score = calculate_api_score(latest_qualification) if latest_qualification else 0
 
-    return render_template("dashboard.html", scholar=user, publications=publications,
-                           qualifications=qualifications, api_score=api_score)
+    return render_template(
+        "dashboard.html",
+        scholar=user,
+        publications=publications,
+        qualifications=qualifications,
+        adqualifications=adqualifications,
+        adawards=adawards,  # ✅ Pass to template
+        adexperience=adexperience, 
+        api_score=api_score
+    )
+
 
 @views.route('/update-dashboard', methods=['POST'])
 def update_dashboard():
@@ -207,17 +219,70 @@ def upload_qualification():
     db = get_db()
 
     qualifications_data = {
-        "graduation": request.form.get("graduation", "").strip(),
-        "post_graduation": request.form.get("post_graduation", "").strip(),
-        "mphil": request.form.get("mphil", "").strip(),
-        "phd": request.form.get("phd", "").strip(),
-        "net_with_jrf": request.form.get("net_with_jrf", "").strip(),
-        "research_publications": request.form.get("research_publications", "").strip(),
-        "technical_experience": request.form.get("technical_experience", "").strip(),
-        "international_awards": request.form.get("international_awards", "").strip(),
-        "state_awards": request.form.get("state_awards", "").strip(),
+        "qualification": request.form.get("qualification", "").strip(),
+        "decipline": request.form.get("decipline", "").strip(),
+        "institution": request.form.get("institution", "").strip(),
+        "marks": request.form.get("marks", "").strip(),
         "user_id": ObjectId(user_id)
     }
 
     db.qualifications.insert_one(qualifications_data)
     return redirect(url_for('views.dashboard'))
+
+@views.route('/upload-adqualification', methods=['POST'])
+def upload_adqualification():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("You must be logged in to upload qualification.", "error")
+        return redirect(url_for('auth.login'))
+
+    db = get_db()
+
+    adqualifications_data = {
+        "adqualification": request.form.get("adqualification", "").strip(),
+        "Year": request.form.get("Year", "").strip(),
+        "user_id": ObjectId(user_id)
+    }
+
+    db.adqualifications.insert_one(adqualifications_data)
+    return redirect(url_for('views.dashboard'))
+
+@views.route('/upload-adexperience', methods=['POST'])
+def upload_adexperience():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("You must be logged in to upload qualification.", "error")
+        return redirect(url_for('auth.login'))
+
+    db = get_db()
+
+    adexperience_data = {
+        "Title": request.form.get("Title", "").strip(),
+        "Companyororganization": request.form.get("Companyororganization", "").strip(),
+        "StartDate": request.form.get("StartDate", "").strip(),
+        "EndDate": request.form.get("EndDate", "").strip(),
+        "user_id": ObjectId(user_id)
+    }
+
+    db.adexperience.insert_one(adexperience_data)
+    return redirect(url_for('views.dashboard'))
+
+@views.route('/upload-adAwards', methods=['POST'])
+def upload_adAwards():
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("You must be logged in to upload qualification.", "error")
+        return redirect(url_for('auth.login'))
+
+    db = get_db()
+
+    adAwards_data = {
+        "Award_Name": request.form.get("Award_Name", "").strip(),
+        "Awards_name": request.form.get("Awards_name", "").strip(),  # ✅ Added this
+        "Date": request.form.get("Date", "").strip(),
+        "user_id": ObjectId(user_id)
+    }
+
+    db.adAwards.insert_one(adAwards_data)
+    return redirect(url_for('views.dashboard'))
+
