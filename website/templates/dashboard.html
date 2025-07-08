@@ -241,64 +241,46 @@
   
   <!-- WRAPPER TABLE TO ALIGN SIDE BY SIDE -->
   <table style="width: 100%; margin-top: 20px; border-spacing: 30px;">
-    <tr>
+  <tr>
+    <!-- LEFT CELL: QUALIFICATION SECTION -->
+    <td style="vertical-align: top; width: 70%;">
       <div class="card">
-      <p><strong>Name:</strong> {{ scholar.username }}</p>
-      <p><strong>Email:</strong> {{ scholar.email }}</p>
-      <p><strong>Google Scholar ID:</strong> {{ scholar.google_scholar_id or 'N/A' }}</p>
-      <p><strong>Institution Name:</strong> {{ scholar.institution or 'N/A' }}</p>
+        <p><strong>Name:</strong> {{ scholar.username }}</p>
+        <p><strong>Email:</strong> {{ scholar.email }}</p>
+        <p><strong>Google Scholar ID:</strong> {{ scholar.google_scholar_id or 'N/A' }}</p>
+        <p><strong>Institution Name:</strong> {{ scholar.institution or 'N/A' }}</p>
 
-      <!-- LEFT CELL: QUALIFICATION TABLE -->
-      <td style="vertical-align: top; width: 70%;">
-        <div class="card">
-          {% if qualifications %}
-          <h4 style="color: #4a0d78;">🧾 Qualifications:</h4>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead>
-              <tr style="background-color: #f3f0fb; text-align: left;">
-                <th style="padding: 8px;">Graduation</th>
-                <th style="padding: 8px;">Post-grad</th>
-                <th style="padding: 8px;">M.Phil</th>
-                <th style="padding: 8px;">PhD</th>
-                <th style="padding: 8px;">NET w/ JRF</th>
-                <th style="padding: 8px;">Publications</th>
-                <th style="padding: 8px;">Experience</th>
-                <th style="padding: 8px;">Intl Awards</th>
-                <th style="padding: 8px;">State Awards</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for q in qualifications %}
-              <tr style="background-color: #fff;">
-                <td style="padding: 8px;">{{ q.graduation }}</td>
-                <td style="padding: 8px;">{{ q.post_graduation }}</td>
-                <td style="padding: 8px;">{{ q.mphil }}</td>
-                <td style="padding: 8px;">{{ q.phd }}</td>
-                <td style="padding: 8px;">{{ q.net_with_jrf }}</td>
-                <td style="padding: 8px;">{{ q.research_publications }}</td>
-                <td style="padding: 8px;">{{ q.technical_experience }}</td>
-                <td style="padding: 8px;">{{ q.international_awards }}</td>
-                <td style="padding: 8px;">{{ q.state_awards }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          <p>No qualifications found.</p>
-          {% endif %}
+        {% if qualifications %}
+        <h4 style="color: #4a0d78;">🧾 Qualifications:</h4>
+        {% for q in qualifications %}
+        <div style="background-color: #f9f9f9; padding: 16px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <p><strong>Graduation:</strong> {{ q.graduation }}</p>
+          <p><strong>Post-grad:</strong> {{ q.post_graduation }}</p>
+          <p><strong>M.Phil:</strong> {{ q.mphil }}</p>
+          <p><strong>PhD:</strong> {{ q.phd }}</p>
+          <p><strong>NET w/ JRF:</strong> {{ q.net_with_jrf }}</p>
+          <p><strong>Publications:</strong> {{ q.research_publications }}</p>
+          <p><strong>Experience:</strong> {{ q.technical_experience }}</p>
+          <p><strong>International Awards:</strong> {{ q.international_awards }}</p>
+          <p><strong>State Awards:</strong> {{ q.state_awards }}</p>
         </div>
-      </td>
+        {% endfor %}
+        {% else %}
+        <p>No qualifications found.</p>
+        {% endif %}
+      </div>
+    </td>
 
-      <!-- RIGHT CELL: API SCORE -->
-      <td style="vertical-align: top; width: 30%;">
-        <div style="background: #e7ffe7; border: 1px solid #a4e7a4; border-radius: 12px; padding: 25px;">
-          <h4 style="color: #2d6a2d;">🎯 API Qualification Score</h4>
-          <p style="font-size: 36px; font-weight: bold; color: #226622; margin: 10px 0;">{{ api_score }}</p>
-        </div>
-      </td>
+    <!-- RIGHT CELL: API SCORE -->
+    <td style="vertical-align: top; width: 30%;">
+      <div style="background: #e7ffe7; border: 1px solid #a4e7a4; border-radius: 12px; padding: 25px;">
+        <h4 style="color: #2d6a2d;">🎯 API Qualification Score</h4>
+        <p style="font-size: 36px; font-weight: bold; color: #226622; margin: 10px 0;">{{ api_score }}</p>
+      </div>
+    </td>
+  </tr>
+</table>
 
-    </tr>
-  </table>
 
   <!-- Edit Basic Info -->
   <form class="edit-form" method="POST" action="/update-dashboard">
@@ -327,6 +309,7 @@
     <input type="text" name="phd" placeholder="Marks in %" required>
     <input type="date" name="net_with_jrf" placeholder="Start Year" required>
     <input type="date" name="net_with_jrf2" placeholder="ENd Year" required>
+    <button type="submit">📤 Submit</button>
     <h3 style="color: #4a0d78;">🧾 Additional Qualification Details</h3>
     <select type="text" name="graduation" placeholder="Graduation" required>
       <option value="ug">NET with JRF</option>

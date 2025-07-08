@@ -16,7 +16,7 @@ def index1():
 def about_us():
     return render_template('about_us.html')
 
-@views.route('/contact-us')
+@views.route('/contact')
 def contact_us():
     return render_template('contact_us.html')
 
