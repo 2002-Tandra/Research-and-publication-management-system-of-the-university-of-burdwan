@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from bson.objectid import ObjectId
 from .database import get_db
+import datetime
 
 views = Blueprint('views', __name__)
 
@@ -57,21 +58,57 @@ def scholarly_articles():
         selected_collection=selected_collection
     )
 
-def calculate_api_score(q):
+def calculate_api_score(qualifications, adqualifications, publications, experience_years):
     score = 0
-    if q.get("graduation") == "Yes": score += 5
-    if q.get("post_graduation") == "Yes": score += 10
-    if q.get("mphil") == "Yes": score += 10
-    if q.get("phd") == "Yes": score += 20
-    if q.get("net_with_jrf") == "Yes": score += 15
-    try:
-        score += int(q.get("research_publications", 0)) * 2
-        score += int(q.get("technical_experience", 0)) * 1
-        score += int(q.get("state_awards", 0)) * 3
-        score += int(q.get("international_awards", 0)) * 5
-    except ValueError:
-        pass
+    for q in qualifications:
+        qual = q.get("qualification", "").lower()
+        try:
+            marks = float(q.get("marks", 0))
+        except (ValueError, TypeError):
+            marks = 0
+
+        # Under Graduation scoring based on marks
+        if "under graduation" in qual:
+            if marks >= 80:
+                score += 15
+            elif marks >= 70:
+                score += 10
+            elif marks >= 60:
+                score += 5
+
+        # Post Graduation scoring based on marks
+        elif "post graducation" in qual:
+            if marks >= 80:
+                score += 25
+            elif marks >= 70:
+                score += 20
+            elif marks >= 60:
+                score += 10
+
+        # M.Phil has fixed score
+        elif "m.phil" in qual:
+            score += 10
+
+        # Ph.D. has fixed score
+        elif "ph.d" in qual or "phd" in qual:
+            score += 30
+
+    # Additional Qualifications scoring
+    for aq in adqualifications:
+        title = aq.get("adqualification", "").lower()
+        if "ugc jrf" in title:
+            score += 25
+        elif "net" in title or "gate" in title:
+            score += 15
+
+    # Publications: 5 points each
+    score += len(publications) * 5
+
+    # Teaching Experience: 2 points per year
+    score += experience_years * 2
+
     return score
+
 
 @views.route('/dashboard')
 def dashboard():
@@ -118,10 +155,20 @@ def dashboard():
 
     qualifications = list(db['qualifications'].find({"user_id": ObjectId(user_id)}))
     adqualifications = list(db['adqualifications'].find({"user_id": ObjectId(user_id)}))
-    adawards = list(db['adAwards'].find({"user_id": ObjectId(user_id)}))  # ✅ Fetch awards
+    adawards = list(db['adAwards'].find({"user_id": ObjectId(user_id)}))
     adexperience = list(db['adexperience'].find({"user_id": ObjectId(user_id)}))
-    latest_qualification = qualifications[-1] if qualifications else {}
-    api_score = calculate_api_score(latest_qualification) if latest_qualification else 0
+
+    # Calculate total years of experience
+    total_years = 0
+    for exp in adexperience:
+        try:
+            start = datetime.datetime.strptime(exp['StartDate'], "%Y-%m-%d")
+            end = datetime.datetime.strptime(exp['EndDate'], "%Y-%m-%d")
+            total_years += (end - start).days // 365
+        except:
+            continue
+
+    api_score = calculate_api_score(qualifications, adqualifications, publications, total_years)
 
     return render_template(
         "dashboard.html",
@@ -129,11 +176,10 @@ def dashboard():
         publications=publications,
         qualifications=qualifications,
         adqualifications=adqualifications,
-        adawards=adawards,  # ✅ Pass to template
-        adexperience=adexperience, 
+        adawards=adawards,
+        adexperience=adexperience,
         api_score=api_score
     )
-
 
 @views.route('/update-dashboard', methods=['POST'])
 def update_dashboard():
@@ -251,7 +297,7 @@ def upload_adqualification():
 def upload_adexperience():
     user_id = session.get('user_id')
     if not user_id:
-        flash("You must be logged in to upload qualification.", "error")
+        flash("You must be logged in to upload experience.", "error")
         return redirect(url_for('auth.login'))
 
     db = get_db()
@@ -271,18 +317,17 @@ def upload_adexperience():
 def upload_adAwards():
     user_id = session.get('user_id')
     if not user_id:
-        flash("You must be logged in to upload qualification.", "error")
+        flash("You must be logged in to upload awards.", "error")
         return redirect(url_for('auth.login'))
 
     db = get_db()
 
     adAwards_data = {
         "Award_Name": request.form.get("Award_Name", "").strip(),
-        "Awards_name": request.form.get("Awards_name", "").strip(),  # ✅ Added this
+        "Awards_name": request.form.get("Awards_name", "").strip(),
         "Date": request.form.get("Date", "").strip(),
         "user_id": ObjectId(user_id)
     }
 
     db.adAwards.insert_one(adAwards_data)
     return redirect(url_for('views.dashboard'))
-
