@@ -134,9 +134,8 @@
         <tr>
           <th>Sl No</th>
           <th>Name</th>
-          <th>Department</th>
-          <
           <th>API Score</th>
+          <th>Details</th>
         </tr>
       </thead>
       <tbody id="data-table">
@@ -144,9 +143,9 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>{{ user.username }}</td>
-            <td>{{ user.department if user.department else "N/A" }}</td>
+            <td>{{ '%.2f' % user.api_score if user.api_score is not none else '0.00' }}</td>
             <td>
-              {{ '%.2f' % user.api_score if user.api_score is not none else '0.00' }}
+              <button class="details-button" onclick="redirectToUserDashboard('{{ user._id }}')">Details</button>
             </td>
           </tr>
         {% endfor %}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f7f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .info-box {
+      margin-bottom: 20px;
+      padding: 20px;
+      background-color: #eaf0f6;
+      border-radius: 8px;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #34495e;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+    }
+
+    .back-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>User Details</h2>
+
+    <div class="info-box">
+      <p><span class="info-label">Name:</span> {{ user.username }}</p>
+      <p><span class="info-label">Email:</span> {{ user.email }}</p>
+      <p><span class="info-label">Mobile:</span> {{ user.mobile }}</p>
+      <p><span class="info-label">Registered On:</span> {{ user.created_at.strftime('%d %B %Y') if user.created_at else 'N/A' }}</p>
+    </div>
+
+    <a href="{{ url_for('admin.admin_dashboard') }}" class="back-btn">← Back to Dashboard</a>
+  </div>
+</body>
+</html>
