@@ -331,3 +331,73 @@ def upload_adAwards():
 
     db.adAwards.insert_one(adAwards_data)
     return redirect(url_for('views.dashboard'))
+
+
+@views.route('/user-dashboard/<user_id>')
+def user_dashboard_by_admin(user_id):
+    db = get_db()
+    user = db['users'].find_one({'_id': ObjectId(user_id)})
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("admin.admin_dashboard"))
+
+    scholar_name = user.get("username", "").lower()
+    publications = []
+
+    publication_collections = [
+        "journal_publications",
+        "conference_publications",
+        "chapter_publications",
+        "book_publications",
+        "thesis_publications",
+        "patent_publications",
+        "website_publications",
+        "others_publications"
+    ]
+
+    for col in publication_collections:
+        try:
+            for pub in db[col].find({"Name": {"$regex": scholar_name, "$options": "i"}}):
+                publications.append({
+                    "publication_type": col.replace("_publications", ""),
+                    "title": pub.get("title") or pub.get("Title") or "N/A",
+                    "authors": pub.get("authors") or pub.get("Authors") or pub.get("Inventors") or "N/A",
+                    "publication_date": pub.get("publication_date") or pub.get("Publication_Date") or "N/A",
+                    "source": (
+                        pub.get("source") or pub.get("Journal") or pub.get("Conference") or
+                        pub.get("Book") or pub.get("Institution") or pub.get("Website") or
+                        pub.get("court") or "N/A"
+                    ),
+                    "_id": str(pub.get("_id"))
+                })
+        except Exception as e:
+            print(f"Error reading from {col}:", e)
+
+    qualifications = list(db['qualifications'].find({"user_id": ObjectId(user_id)}))
+    adqualifications = list(db['adqualifications'].find({"user_id": ObjectId(user_id)}))
+    adawards = list(db['adAwards'].find({"user_id": ObjectId(user_id)}))
+    adexperience = list(db['adexperience'].find({"user_id": ObjectId(user_id)}))
+
+    total_years = 0
+    for exp in adexperience:
+        try:
+            start = datetime.datetime.strptime(exp['StartDate'], "%Y-%m-%d")
+            end = datetime.datetime.strptime(exp['EndDate'], "%Y-%m-%d")
+            total_years += (end - start).days // 365
+        except:
+            continue
+
+    api_score = calculate_api_score(qualifications, adqualifications, publications, total_years)
+
+    return render_template(
+        "dashboard.html",
+        scholar=user,
+        publications=publications,
+        qualifications=qualifications,
+        adqualifications=adqualifications,
+        adawards=adawards,
+        adexperience=adexperience,
+        api_score=api_score,
+        viewing_as_admin=True
+    )
+
